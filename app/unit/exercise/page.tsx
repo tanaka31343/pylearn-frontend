@@ -253,6 +253,11 @@ function ExercisePageInner() {
         backLabel="← せつめいに　もどる"
         backHref={`/unit/explanation?unitId=${unitId}&learnerId=${learnerId}`}
       />
+      {!pyodideReady && (
+        <div className="bg-purple-50 border-b border-purple-200 px-6 py-2 text-xs text-purple-700 text-center animate-pulse">
+          ⏳ Pythonを　よみこんでいます... しばらく　まってね（はじめてのときは　すこし　じかんが　かかるよ）
+        </div>
+      )}
 
       <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 52px)" }}>
         {/* problem panel */}
@@ -328,7 +333,7 @@ function ExercisePageInner() {
               disabled={runButtonDisabled}
               className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors ${runButtonDisabled ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-purple-500 hover:bg-purple-600 text-white"}`}
             >
-              ▶ {!pyodideReady ? "よみこみちゅう..." : cooldown > 0 ? `まってね... (${cooldown}びょう)` : "じっこう"}
+              ▶ {!pyodideReady ? "Pythonを　よみこみちゅう..." : cooldown > 0 ? `まってね... (${cooldown}びょう)` : "じっこう"}
             </button>
           </div>
         </div>

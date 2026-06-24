@@ -246,6 +246,11 @@ function ChallengePageInner() {
       )}
 
       {/* チャレンジ済み表示（再チャレンジ可） */}
+      {locked === "" && !pyodideReady && (
+        <div className="bg-yellow-50 border-b border-yellow-200 px-6 py-2 text-xs text-yellow-700 text-center animate-pulse">
+          ⏳ Pythonを　よみこんでいます... しばらく　まってね（はじめてのときは　すこし　じかんが　かかるよ）
+        </div>
+      )}
       {locked === "" && alreadyEarned && (
         <div className="bg-yellow-50 border-b border-yellow-200 px-6 py-2 text-xs text-yellow-700 text-center">
           {badge?.emoji} このチャレンジは　クリアずみ！　もう一度　たのしんでね。
