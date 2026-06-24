@@ -190,10 +190,11 @@ function ExercisePageInner() {
 
       if (ex.validate(stdout)) {
         setIsCorrect(true);
-        // 最後の問題のときだけ進捗を記録
+        // 最後の問題のときだけ進捗・バッジを記録
         if (exIndex === exercises.length - 1) {
           if (learnerId) {
             await apiClient.post(`/progress/${learnerId}`, { unit_id: uid, step: "exercise" });
+            await apiClient.post(`/badges/${learnerId}`, { badge_type: `unit_${uid}_complete` });
             await apiClient.post(`/learning-logs/${learnerId}`);
           }
           setShowBadge(true);
