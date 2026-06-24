@@ -1,10 +1,6 @@
-export function generateStaticParams() {
-  return [{ unitId: "1" }, { unitId: "2" }, { unitId: "3" }];
-}
-
 "use client";
 import { useState, useCallback } from "react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import GlobalNav from "@/components/GlobalNav";
@@ -41,8 +37,8 @@ const EXERCISES: Record<number, {
 
 export default function ExercisePage() {
   useRequireAuth();
-  const { unitId } = useParams<{ unitId: string }>();
   const searchParams = useSearchParams();
+  const unitId = searchParams.get("unitId");
   const learnerId = searchParams.get("learnerId");
   const router = useRouter();
 
@@ -88,7 +84,6 @@ export default function ExercisePage() {
 
       if (stdout.includes(ex.expected)) {
         setIsCorrect(true);
-        // 進捗を保存
         if (learnerId) {
           await apiClient.post(`/progress/${learnerId}`, { unit_id: uid, step: "exercise" });
           await apiClient.post(`/learning-logs/${learnerId}`);
@@ -121,14 +116,14 @@ export default function ExercisePage() {
           <p className="text-sm text-purple-600 font-medium mb-6">バッジを　てにいれた！</p>
           <div className="flex gap-3 justify-center">
             <button
-              onClick={() => router.push(`/learner/${learnerId}`)}
+              onClick={() => router.push(`/learner?id=${learnerId}`)}
               className="px-5 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50"
             >
               マイページに　もどる
             </button>
             {uid < 3 && (
               <button
-                onClick={() => router.push(`/unit/${uid + 1}/explanation?learnerId=${learnerId}`)}
+                onClick={() => router.push(`/unit/explanation?unitId=${uid + 1}&learnerId=${learnerId}`)}
                 className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm font-medium"
               >
                 つぎの　たんげんへ
@@ -146,7 +141,7 @@ export default function ExercisePage() {
         subtitle={`だいたんげん${uid}　えんしゅう`}
         showBack
         backLabel="← せつめいに　もどる"
-        backHref={`/unit/${unitId}/explanation?learnerId=${learnerId}`}
+        backHref={`/unit/explanation?unitId=${unitId}&learnerId=${learnerId}`}
       />
 
       <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 52px)" }}>

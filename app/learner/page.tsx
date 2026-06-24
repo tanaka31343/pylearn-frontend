@@ -1,10 +1,6 @@
-export function generateStaticParams() {
-  return [];
-}
-
 "use client";
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useLearnerStore } from "@/store/learnerStore";
 import GlobalNav from "@/components/GlobalNav";
@@ -28,7 +24,8 @@ const BADGE_LABELS: Record<string, string> = {
 
 export default function MyPage() {
   useRequireAuth();
-  const { id } = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const router = useRouter();
   const currentLearner = useLearnerStore((s) => s.currentLearner);
   const [badges, setBadges] = useState<Badge[]>([]);
@@ -50,7 +47,6 @@ export default function MyPage() {
 
   const completedSteps = progress.filter((p) => p.completed).length;
   const totalSteps = UNITS.length * 3;
-
   const earnedBadgeTypes = new Set(badges.map((b) => b.badge_type));
 
   return (
@@ -116,7 +112,7 @@ export default function MyPage() {
                   return (
                     <button
                       key={unit.id}
-                      onClick={() => router.push(`/unit/${unit.id}/explanation?learnerId=${id}`)}
+                      onClick={() => router.push(`/unit/explanation?unitId=${unit.id}&learnerId=${id}`)}
                       className="flex items-center gap-3 p-3 border border-gray-200 hover:border-purple-400 rounded-xl text-left transition-colors"
                     >
                       <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-medium flex-shrink-0 ${isComplete ? "bg-green-100 text-green-700" : isActive ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-400"}`}>

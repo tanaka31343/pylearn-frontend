@@ -38,7 +38,7 @@ export default function SelectLearnerPage() {
 
   const handleSelect = (learner: Learner) => {
     setCurrentLearner(learner);
-    router.push(`/learner/${learner.id}`);
+    router.push(`/learner?id=${learner.id}`);
   };
 
   const handleAdd = async (e: React.FormEvent) => {

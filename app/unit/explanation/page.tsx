@@ -1,9 +1,5 @@
-export function generateStaticParams() {
-  return [{ unitId: "1" }, { unitId: "2" }, { unitId: "3" }];
-}
-
 "use client";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import GlobalNav from "@/components/GlobalNav";
 import CharaSpeech from "@/components/CharaSpeech";
@@ -12,25 +8,21 @@ const UNIT_CONTENT: Record<number, {
   title: string;
   speech: string;
   codeExample: string;
-  stepLabels: string[];
 }> = {
   1: {
     title: "print・へんすう",
     speech: "「へんすう」をつかうと、なまえや　かずを　おぼえさせることが　できるよ！\n\nprint()をつかうと、おぼえさせたものを　がめんに　ひょうじできるんだ。",
     codeExample: `name = "たろう"\nprint("こんにちは、" + name)`,
-    stepLabels: ["せつめい", "れいだい", "えんしゅう"],
   },
   2: {
     title: "すうじ・えんざん",
     speech: "Pythonでは　たし算・ひき算・かけ算・わり算が　できるよ！\n\nキャラクターのHPを　けいさんして　みよう。",
     codeExample: `hp = 100\ndamage = 30\nhp = hp - damage\nprint("のこりHP:", hp)`,
-    stepLabels: ["せつめい", "れいだい", "えんしゅう"],
   },
   3: {
     title: "if文",
     speech: "「if文」をつかうと、じょうけんによって　ちがう　うごきを　させられるよ！\n\nたとえば「HPが0より　おおきければ　かった！」そうじゃなければ「まけた…」と　ひょうじできるんだ。",
     codeExample: `hp = 10\nif hp > 0:\n    print("かった！")\nelse:\n    print("まけた…")`,
-    stepLabels: ["せつめい", "れいだい", "えんしゅう"],
   },
 };
 
@@ -42,8 +34,8 @@ const UNIT_LIST = [
 
 export default function ExplanationPage() {
   useRequireAuth();
-  const { unitId } = useParams<{ unitId: string }>();
   const searchParams = useSearchParams();
+  const unitId = searchParams.get("unitId");
   const learnerId = searchParams.get("learnerId");
   const router = useRouter();
 
@@ -54,7 +46,7 @@ export default function ExplanationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <GlobalNav showBack backLabel="← マイページ" backHref={`/learner/${learnerId}`} />
+      <GlobalNav showBack backLabel="← マイページ" backHref={`/learner?id=${learnerId}`} />
       <div className="max-w-5xl mx-auto px-8 py-8 grid grid-cols-[220px_1fr] gap-6">
         {/* unit sidebar */}
         <div>
@@ -63,7 +55,7 @@ export default function ExplanationPage() {
             {UNIT_LIST.map((u) => (
               <button
                 key={u.id}
-                onClick={() => router.push(`/unit/${u.id}/explanation?learnerId=${learnerId}`)}
+                onClick={() => router.push(`/unit/explanation?unitId=${u.id}&learnerId=${learnerId}`)}
                 className={`flex items-center gap-2.5 p-3 rounded-xl border text-left transition-colors ${u.id === uid ? "border-purple-400 border-2 bg-white" : "border-gray-200 bg-white hover:border-gray-300"}`}
               >
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-medium flex-shrink-0 ${u.id === uid ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-400"}`}>
@@ -102,7 +94,7 @@ export default function ExplanationPage() {
               ← もどる
             </button>
             <button
-              onClick={() => router.push(`/unit/${unitId}/exercise?learnerId=${learnerId}`)}
+              onClick={() => router.push(`/unit/exercise?unitId=${unitId}&learnerId=${learnerId}`)}
               className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm font-medium"
             >
               えんしゅうへ →
