@@ -46,3 +46,9 @@ dev.log
 AGENTS.md
 CLAUDE.md
 README.md
+
+# playwright
+e2e/screenshots/
+e2e/report/
+playwright-report/
+test-results/
