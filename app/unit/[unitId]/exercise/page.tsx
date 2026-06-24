@@ -1,3 +1,7 @@
+export function generateStaticParams() {
+  return [{ unitId: "1" }, { unitId: "2" }, { unitId: "3" }];
+}
+
 "use client";
 import { useState, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";

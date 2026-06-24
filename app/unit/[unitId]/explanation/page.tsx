@@ -1,3 +1,7 @@
+export function generateStaticParams() {
+  return [{ unitId: "1" }, { unitId: "2" }, { unitId: "3" }];
+}
+
 "use client";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
