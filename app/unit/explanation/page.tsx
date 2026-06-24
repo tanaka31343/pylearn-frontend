@@ -5,25 +5,65 @@ import { useRequireAuth } from "@/hooks/useRequireAuth";
 import GlobalNav from "@/components/GlobalNav";
 import CharaSpeech from "@/components/CharaSpeech";
 
+interface CodeBlock {
+  label: string;
+  code: string;
+}
+
 const UNIT_CONTENT: Record<number, {
   title: string;
   speech: string;
-  codeExample: string;
+  codeBlocks: CodeBlock[];
 }> = {
   1: {
     title: "print・へんすう",
-    speech: "「へんすう」をつかうと、なまえや　かずを　おぼえさせることが　できるよ！\n\nprint()をつかうと、おぼえさせたものを　がめんに　ひょうじできるんだ。",
-    codeExample: `name = "たろう"\nprint("こんにちは、" + name)`,
+    speech: "「へんすう」をつかうと、なまえや　かずを　おぼえさせることが　できるよ！\n\nprint()をつかうと、おぼえさせたものを　がめんに　ひょうじできるんだ。\n\nまた、「+」をつかうと　もじと　もじを　くっつけることが　できるよ！",
+    codeBlocks: [
+      {
+        label: "へんすうと　print",
+        code: `name = "たろう"\nprint(name)  # たろう`,
+      },
+      {
+        label: "「+」で　もじを　くっつける",
+        code: `name = "たろう"\nprint("こんにちは、" + name + "！")\n# → こんにちは、たろう！`,
+      },
+    ],
   },
   2: {
     title: "すうじ・えんざん",
-    speech: "Pythonでは　たし算・ひき算・かけ算・わり算が　できるよ！\n\nキャラクターのHPを　けいさんして　みよう。",
-    codeExample: `hp = 100\ndamage = 30\nhp = hp - damage\nprint("のこりHP:", hp)`,
+    speech: "Pythonでは　たし算・ひき算・かけ算・わり算が　できるよ！\n\nきごうは　それぞれ　+（たす）、-（ひく）、*（かける）、/（わる）を　つかうんだ。\n\nゲームのHPや　スコアを　けいさんして　みよう！",
+    codeBlocks: [
+      {
+        label: "たし算（+）",
+        code: `hp = 50\nheal = 30\nhp = hp + heal\nprint("かいふく後のHP:", hp)  # 80`,
+      },
+      {
+        label: "ひき算（-）",
+        code: `hp = 100\ndamage = 30\nhp = hp - damage\nprint("のこりHP:", hp)  # 70`,
+      },
+      {
+        label: "かけ算（*）",
+        code: `attack = 15\nrate = 2\ndamage = attack * rate\nprint("ダメージ:", damage)  # 30`,
+      },
+      {
+        label: "わり算（/）",
+        code: `score = 200\nplayers = 2\nshare = score / players\nprint("1人ぶん:", share)  # 100.0`,
+      },
+    ],
   },
   3: {
     title: "if文",
-    speech: "「if文」をつかうと、じょうけんによって　ちがう　うごきを　させられるよ！\n\nたとえば「HPが0より　おおきければ　かった！」そうじゃなければ「まけた…」と　ひょうじできるんだ。",
-    codeExample: `hp = 10\nif hp > 0:\n    print("かった！")\nelse:\n    print("まけた…")`,
+    speech: "「if文」をつかうと、じょうけんによって　ちがう　うごきを　させられるよ！\n\nじょうけんには　6つの　くらべかたが　あるよ：\n　>（より　おおきい）　　<（より　ちいさい）\n　>=（いじょう）　　　　<=（いか）\n　==（おなじ）　　　　　!=（ちがう）\n\nさらに　elif で　3つ以上の　ばあいわけも　できるよ！",
+    codeBlocks: [
+      {
+        label: "> / < / >= / <=",
+        code: `hp = 50\nif hp >= 80:\n    print("げんき！")\nelif hp >= 30:\n    print("ピンチ！")\nelse:\n    print("まけた…")`,
+      },
+      {
+        label: "==（おなじ）/ !=（ちがう）",
+        code: `item = "つるぎ"\nif item == "つるぎ":\n    print("ぶきを　そうびした！")\nelse:\n    print("そうびできない…")\n\nif item != "たて":\n    print("たては　もっていない")`,
+      },
+    ],
   },
 };
 
@@ -83,9 +123,20 @@ function ExplanationPageInner() {
 
           <CharaSpeech text={content.speech} />
 
-          <div className="bg-gray-800 rounded-xl p-5 font-mono text-sm leading-7 text-gray-100 mb-6 whitespace-pre">
-            {content.codeExample}
-          </div>
+          {content.codeBlocks.length === 1 ? (
+            <div className="bg-gray-800 rounded-xl p-5 font-mono text-sm leading-7 text-gray-100 mb-6 whitespace-pre">
+              {content.codeBlocks[0].code}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              {content.codeBlocks.map((block) => (
+                <div key={block.label} className="bg-gray-800 rounded-xl p-4">
+                  <p className="text-xs text-purple-400 mb-2 font-medium">{block.label}</p>
+                  <pre className="font-mono text-xs leading-6 text-gray-100 whitespace-pre overflow-x-auto">{block.code}</pre>
+                </div>
+              ))}
+            </div>
+          )}
 
           <div className="flex justify-end gap-3">
             <button

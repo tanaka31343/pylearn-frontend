@@ -4,6 +4,7 @@ const basePath = process.env.NODE_ENV === "production" ? "/pylearn-frontend" : "
 
 const nextConfig: NextConfig = {
   output: "export",
+  devIndicators: false,
   trailingSlash: true,
   images: {
     unoptimized: true,
