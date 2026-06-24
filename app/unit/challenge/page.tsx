@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useRef, useEffect, Suspense } from "react";
+import { useState, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -17,7 +17,6 @@ interface ChallengeItem {
   validate: (stdout: string) => boolean;
 }
 
-// 解放条件: unit_N_complete バッジ + unit_(N-1)_challenge バッジ（N=1は不要）
 const CHALLENGES: Record<number, ChallengeItem> = {
   1: {
     question:
@@ -68,7 +67,6 @@ const CHALLENGE_BADGE: Record<number, { emoji: string; label: string }> = {
   3: { emoji: "🏆", label: "「if文　チャレンジャー」" },
 };
 
-// 解放条件を満たしているか確認
 function canAttempt(unitId: number, earnedBadges: Set<string>): boolean {
   const hasBasic = earnedBadges.has(`unit_${unitId}_complete`);
   if (unitId === 1) return hasBasic;
@@ -95,16 +93,9 @@ function ChallengePageInner() {
   const [isIncorrect, setIsIncorrect] = useState(false);
   const [running, setRunning] = useState(false);
   const [showBadge, setShowBadge] = useState(false);
-  const [pyodideReady, setPyodideReady] = useState(false);
-  const [loadProgress, setLoadProgress] = useState(0);
-  const [locked, setLocked] = useState<null | string>(null); // null=loading, string=lock reason or ""=unlocked
+  const [locked, setLocked] = useState<null | string>(null);
   const [alreadyEarned, setAlreadyEarned] = useState(false);
 
-  const workerRef = useRef<Worker | null>(null);
-  const callbacksRef = useRef<Map<number, (r: { stdout: string; stderr: string; exitCode: number }) => void>>(new Map());
-  const reqIdRef = useRef(0);
-
-  // 解放条件チェック
   useEffect(() => {
     if (!learnerId) return;
     apiClient.get(`/badges/${learnerId}`).then((res) => {
@@ -126,30 +117,13 @@ function ChallengePageInner() {
     }).catch(() => setLocked(""));
   }, [learnerId, uid]);
 
-  // Pyodide Worker 初期化
-  useEffect(() => {
-    const worker = new Worker("/pyodide-worker.js");
-    workerRef.current = worker;
-    worker.onmessage = (e) => {
-      const { id, stdout, stderr, exitCode, progress } = e.data;
-      if (id === -1) {
-        if (progress !== undefined) setLoadProgress(progress);
-        if (exitCode === 0) setPyodideReady(true);
-        return;
-      }
-      const cb = callbacksRef.current.get(id);
-      if (cb) { cb({ stdout, stderr, exitCode }); callbacksRef.current.delete(id); }
+  const runCode = useCallback(async (code: string) => {
+    const res = await apiClient.post("/execute", { code });
+    return {
+      stdout: (res.data.stdout ?? "") as string,
+      stderr: (res.data.stderr ?? "") as string,
+      exitCode: (res.data.exit_code ?? 0) as number,
     };
-    worker.postMessage({ id: -1, code: "1+1" });
-    return () => worker.terminate();
-  }, []);
-
-  const runCode = useCallback((code: string): Promise<{ stdout: string; stderr: string; exitCode: number }> => {
-    return new Promise((resolve) => {
-      const id = ++reqIdRef.current;
-      callbacksRef.current.set(id, resolve);
-      workerRef.current?.postMessage({ id, code });
-    });
   }, []);
 
   const startCooldown = useCallback(() => {
@@ -174,11 +148,11 @@ function ChallengePageInner() {
     try {
       const res = await runCode(code);
       const stdout = res.stdout.trim();
-      const stderr = res.stderr.trim();
+      const stderrText = res.stderr.trim();
       setOutput(stdout);
-      setStderr(stderr);
+      setStderr(stderrText);
 
-      if (challenge.validate(stdout)) {
+      if (res.exitCode === 0 && challenge.validate(stdout)) {
         setIsCorrect(true);
         if (learnerId && !alreadyEarned) {
           await apiClient.post(`/progress/${learnerId}`, { unit_id: uid, step: "challenge" });
@@ -199,10 +173,9 @@ function ChallengePageInner() {
 
   if (!challenge) return null;
 
-  const runButtonDisabled = cooldown > 0 || running || !pyodideReady || !!locked;
+  const runButtonDisabled = cooldown > 0 || running || !!locked;
   const badge = CHALLENGE_BADGE[uid];
 
-  // バッジ獲得画面
   if (showBadge) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -233,7 +206,6 @@ function ChallengePageInner() {
         backHref={`/learner?id=${learnerId}`}
       />
 
-      {/* 解放条件未達 */}
       {locked && (
         <div className="flex flex-1 items-center justify-center">
           <div className="bg-white border border-gray-200 rounded-2xl p-10 text-center max-w-sm">
@@ -250,35 +222,18 @@ function ChallengePageInner() {
         </div>
       )}
 
-      {/* チャレンジ済み表示（再チャレンジ可） */}
-      {locked === "" && !pyodideReady && (
-        <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-2">
-          <div className="flex items-center gap-3 max-w-md mx-auto">
-            <span className="text-xs text-yellow-700 whitespace-nowrap">⏳ Pythonを　よみこみちゅう...</span>
-            <div className="flex-1 bg-yellow-200 rounded-full h-2">
-              <div
-                className="bg-yellow-500 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${loadProgress}%` }}
-              />
-            </div>
-            <span className="text-xs text-yellow-700 w-8 text-right">{loadProgress}%</span>
-          </div>
-        </div>
-      )}
-      {locked === "" && alreadyEarned && (
-        <div className="bg-yellow-50 border-b border-yellow-200 px-6 py-2 text-xs text-yellow-700 text-center">
-          {badge?.emoji} このチャレンジは　クリアずみ！　もう一度　たのしんでね。
-        </div>
-      )}
-
-      {/* ロード中 */}
       {locked === null && (
         <div className="flex flex-1 items-center justify-center">
           <p className="text-sm text-gray-400">よみこみちゅう...</p>
         </div>
       )}
 
-      {/* チャレンジ本体 */}
+      {locked === "" && alreadyEarned && (
+        <div className="bg-yellow-50 border-b border-yellow-200 px-6 py-2 text-xs text-yellow-700 text-center">
+          {badge?.emoji} このチャレンジは　クリアずみ！　もう一度　たのしんでね。
+        </div>
+      )}
+
       {locked === "" && (
         <div className="flex flex-1 overflow-hidden" style={{ height: "calc(100vh - 52px)" }}>
           {/* problem panel */}
@@ -339,7 +294,7 @@ function ChallengePageInner() {
                 disabled={runButtonDisabled}
                 className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors ${runButtonDisabled ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600 text-white"}`}
               >
-                ▶ {!pyodideReady ? "よみこみちゅう..." : cooldown > 0 ? `まってね... (${cooldown}びょう)` : "じっこう"}
+                ▶ {running ? "じっこうちゅう..." : cooldown > 0 ? `まってね... (${cooldown}びょう)` : "じっこう"}
               </button>
             </div>
           </div>
@@ -352,7 +307,7 @@ function ChallengePageInner() {
             </div>
 
             {stderr && (
-              <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700 mb-3 font-mono">
+              <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700 mb-3 font-mono whitespace-pre-line">
                 {stderr}
               </div>
             )}

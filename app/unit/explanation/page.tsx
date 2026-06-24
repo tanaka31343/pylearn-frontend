@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useEffect } from "react";
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import GlobalNav from "@/components/GlobalNav";
@@ -82,15 +82,6 @@ function ExplanationPageInner() {
 
   const uid = Number(unitId);
   const content = UNIT_CONTENT[uid];
-
-  // 説明ページ表示中にPyodideをバックグラウンドでプリロードする
-  useEffect(() => {
-    const worker = new Worker("/pyodide-worker.js");
-    worker.postMessage({ id: -1, code: "" });
-    // ウォームアップ完了後に終了（ブラウザキャッシュにPyodideが残る）
-    worker.onmessage = () => worker.terminate();
-    return () => worker.terminate();
-  }, []);
 
   if (!content) return null;
 
