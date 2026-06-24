@@ -179,7 +179,10 @@ function ExercisePageInner() {
         {/* problem panel */}
         <div className="w-72 border-r border-gray-200 p-5 overflow-y-auto bg-white flex-shrink-0">
           <p className="text-sm font-medium text-gray-800 mb-4">もんだい</p>
-          <CharaSpeech text={ex.question} />
+          <CharaSpeech
+            text={ex.question}
+            charaType={isCorrect ? "correct" : isIncorrect ? "incorrect" : "normal"}
+          />
 
           <div className="bg-gray-50 rounded-xl p-3 text-xs font-mono text-gray-700 mb-4">
             <p className="text-gray-400 mb-1">きたいされる　けっか：</p>
