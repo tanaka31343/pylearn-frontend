@@ -144,14 +144,16 @@ test.describe("学習フロー（ユニット3・if文）", () => {
     const learnerBtn = page.locator("button.rounded-2xl").first();
     await learnerBtn.click();
     await page.waitForURL("**/learner**", { timeout: 5000 });
-    await page.getByText("if文").click();
+    // バッジ表示にも「if文」が含まれるため、単元ボタンを role で特定する
+    await page.getByRole("button", { name: /if文.*てきとの/ }).click();
     await page.waitForURL("**/unit/explanation**", { timeout: 5000 });
   });
 
   test("説明ページに比較演算子が表示される", async ({ page }) => {
     await saveScreenshot(page, "50-unit3-explanation");
-    await expect(page.getByText(/==（おなじ）/)).toBeVisible();
-    await expect(page.getByText(/!=（ちがう）/)).toBeVisible();
+    // コードブロックのラベルで特定（スピーチバブルにも同テキストが含まれるため first() を使用）
+    await expect(page.getByText(/==（おなじ）/).first()).toBeVisible();
+    await expect(page.getByText(/!=（ちがう）/).first()).toBeVisible();
   });
 
   test("if/elif/else問題に正解するとバッジが表示される", async ({ page }) => {
@@ -239,21 +241,26 @@ test.describe("チャレンジ問題（ユニット1）", () => {
   });
 
   test("チャレンジ問題に正解するとチャレンジバッジが表示される", async ({ page }) => {
-    // 事前条件: unit_1_completeバッジを持つ学習者でないとスキップ
-    // ここではチャレンジページを開いてロック状態を確認し、解放済みならテストを実行
-    const id = new URL(page.url()).searchParams.get("id") ?? "";
+    const url = new URL(page.url());
+    const id = url.searchParams.get("id") ?? "";
     await page.goto(`/unit/challenge?unitId=1&learnerId=${id}`);
 
-    const isLocked = await page.getByText("まだ　チャレンジできないよ").isVisible({ timeout: 5000 }).catch(() => false);
+    // ロックかチャレンジ画面かを確認（APIレスポンス待ちのため十分に待つ）
+    const lockedText = page.getByText("まだ　チャレンジできないよ");
+    const challengeText = page.getByText("チャレンジもんだい");
+    await expect(lockedText.or(challengeText)).toBeVisible({ timeout: 10000 });
+
+    const isLocked = await lockedText.isVisible().catch(() => false);
     if (isLocked) {
-      test.skip();
+      test.skip(true, "unit_1_completeバッジ未取得のためスキップ");
       return;
     }
 
-    await page.waitForSelector(".monaco-editor", { timeout: 10000 });
+    // チャレンジページが開いたことを確認してからエディタを待つ
+    await expect(challengeText).toBeVisible({ timeout: 3000 });
+    await page.waitForSelector(".monaco-editor", { timeout: 15000 });
     await expect(page.getByRole("button", { name: /じっこう/ })).toBeEnabled({ timeout: 60000 });
 
-    // ユニット1チャレンジの正解コード
     await setEditorCode(page, 'name = "たろう"\njob = "ゆうしゃ"\nweapon = "つるぎ"\nprint("なまえ：" + name)\nprint("しょくぎょう：" + job)\nprint(name + "の　ぶき：" + weapon)');
 
     await page.getByRole("button", { name: /じっこう/ }).click();
@@ -263,20 +270,20 @@ test.describe("チャレンジ問題（ユニット1）", () => {
 });
 
 test.describe("チャレンジ問題（解放条件・ユニット2）", () => {
-  test("ユニット1チャレンジ未完の場合ユニット2チャレンジはロックされる", async ({ page }) => {
+  test("ユニット2チャレンジページが開く（ロックまたは解放のいずれか）", async ({ page }) => {
     await login(page);
     const learnerBtn = page.locator("button.rounded-2xl").first();
     await learnerBtn.click();
     await page.waitForURL("**/learner**", { timeout: 5000 });
 
-    const url = new URL(page.url());
-    const id = url.searchParams.get("id") ?? "";
-    await page.goto(`/unit/challenge?unitId=2&learnerId=${id}`);
+    // マイページURLからlearnerIdを取得
+    const learnerId = new URL(page.url()).searchParams.get("id") ?? "";
+    await page.goto(`/unit/challenge?unitId=2&learnerId=${learnerId}`);
 
-    const isLocked = await page.getByText("まだ　チャレンジできないよ").isVisible({ timeout: 8000 }).catch(() => false);
-    const isOpen = await page.getByText("チャレンジもんだい").isVisible({ timeout: 3000 }).catch(() => false);
+    // ロック画面かチャレンジ画面のどちらかが表示されれば正常
+    await expect(
+      page.getByText("まだ　チャレンジできないよ").or(page.getByText("チャレンジもんだい"))
+    ).toBeVisible({ timeout: 10000 });
     await saveScreenshot(page, "64-unit2-challenge-gate");
-    // unit_1_challenge がなければロック、あれば開放 — どちらかであればよい
-    expect(isLocked || isOpen).toBeTruthy();
   });
 });
