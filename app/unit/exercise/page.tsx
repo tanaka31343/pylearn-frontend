@@ -126,6 +126,7 @@ function ExercisePageInner() {
   const [running, setRunning] = useState(false);
   const [showBadge, setShowBadge] = useState(false);
   const [pyodideReady, setPyodideReady] = useState(false);
+  const [loadProgress, setLoadProgress] = useState(0);
   const workerRef = useRef<Worker | null>(null);
   const callbacksRef = useRef<Map<number, (result: { stdout: string; stderr: string; exitCode: number }) => void>>(new Map());
   const reqIdRef = useRef(0);
@@ -134,8 +135,12 @@ function ExercisePageInner() {
     const worker = new Worker("/pyodide-worker.js");
     workerRef.current = worker;
     worker.onmessage = (e) => {
-      const { id, stdout, stderr, exitCode } = e.data;
-      if (id === -1) { setPyodideReady(true); return; }
+      const { id, stdout, stderr, exitCode, progress } = e.data;
+      if (id === -1) {
+        if (progress !== undefined) setLoadProgress(progress);
+        if (exitCode === 0) setPyodideReady(true);
+        return;
+      }
       const cb = callbacksRef.current.get(id);
       if (cb) { cb({ stdout, stderr, exitCode }); callbacksRef.current.delete(id); }
     };
@@ -254,8 +259,17 @@ function ExercisePageInner() {
         backHref={`/unit/explanation?unitId=${unitId}&learnerId=${learnerId}`}
       />
       {!pyodideReady && (
-        <div className="bg-purple-50 border-b border-purple-200 px-6 py-2 text-xs text-purple-700 text-center animate-pulse">
-          ⏳ Pythonを　よみこんでいます... しばらく　まってね（はじめてのときは　すこし　じかんが　かかるよ）
+        <div className="bg-purple-50 border-b border-purple-200 px-4 py-2">
+          <div className="flex items-center gap-3 max-w-md mx-auto">
+            <span className="text-xs text-purple-700 whitespace-nowrap">⏳ Pythonを　よみこみちゅう...</span>
+            <div className="flex-1 bg-purple-200 rounded-full h-2">
+              <div
+                className="bg-purple-500 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${loadProgress}%` }}
+              />
+            </div>
+            <span className="text-xs text-purple-700 w-8 text-right">{loadProgress}%</span>
+          </div>
         </div>
       )}
 

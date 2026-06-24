@@ -2,9 +2,14 @@ importScripts("https://cdn.jsdelivr.net/pyodide/v0.27.6/full/pyodide.js");
 
 let pyodide = null;
 
-async function loadPyodideInstance() {
+async function loadPyodideInstance(onProgress) {
   if (!pyodide) {
+    onProgress(10);
     pyodide = await loadPyodide();
+    onProgress(85);
+    // 標準ライブラリのウォームアップ
+    pyodide.runPython("import sys, traceback\nfrom io import StringIO");
+    onProgress(100);
   }
   return pyodide;
 }
@@ -24,14 +29,15 @@ const ERROR_LABELS = {
 self.onmessage = async (event) => {
   const { id, code } = event.data;
   try {
-    const py = await loadPyodideInstance();
+    const py = await loadPyodideInstance((progress) => {
+      self.postMessage({ id: -1, progress, stdout: "", stderr: "", exitCode: -1 });
+    });
 
     if (id === -1) {
-      self.postMessage({ id: -1, stdout: "", stderr: "", exitCode: 0 });
+      self.postMessage({ id: -1, progress: 100, stdout: "", stderr: "", exitCode: 0 });
       return;
     }
 
-    // stdout/stderr をキャプチャ、エラー情報取得用のヘルパーも準備
     py.runPython(`
 import sys, traceback
 from io import StringIO
@@ -47,7 +53,6 @@ _last_error = None
       py.runPython(code);
     } catch (_) {
       exitCode = 1;
-      // Python 側でエラー情報を構造化して取得
       const errorInfo = py.runPython(`
 import sys, traceback
 _et, _ev, _tb = sys.exc_info()
