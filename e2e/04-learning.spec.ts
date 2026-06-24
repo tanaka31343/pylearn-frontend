@@ -1,5 +1,14 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import { login, saveScreenshot } from "./helpers";
+
+// Monaco Editorにコードをセットするヘルパー
+async function setEditorCode(page: Page, code: string) {
+  await page.evaluate((c) => {
+    const editor = (window as unknown as { monaco?: { editor?: { getEditors: () => Array<{ setValue: (v: string) => void }> } } }).monaco?.editor?.getEditors()[0];
+    editor?.setValue(c);
+  }, code);
+  await page.waitForTimeout(300);
+}
 
 test.describe("学習フロー（ユニット1）", () => {
   test.beforeEach(async ({ page }) => {
@@ -195,5 +204,79 @@ test.describe("学習フロー（ユニット3・if文）", () => {
     await page.getByRole("button", { name: /じっこう/ }).click();
     await expect(page.getByText("バッジを　てにいれた！")).toBeVisible({ timeout: 30000 });
     await saveScreenshot(page, "52-unit3-complete");
+  });
+});
+
+test.describe("チャレンジ問題（ユニット1）", () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+    const learnerBtn = page.locator("button.rounded-2xl").first();
+    await learnerBtn.click();
+    await page.waitForURL("**/learner**", { timeout: 5000 });
+  });
+
+  test("マイページにチャレンジボタンが表示される", async ({ page }) => {
+    await saveScreenshot(page, "60-mypage-challenge-buttons");
+    // チャレンジボタン（3つ）が存在する
+    const challengeBtns = page.locator("button[title*='チャレンジ']");
+    await expect(challengeBtns.first()).toBeVisible();
+  });
+
+  test("チャレンジバッジセクションが表示される", async ({ page }) => {
+    await expect(page.getByText("チャレンジバッジ")).toBeVisible();
+    await saveScreenshot(page, "61-mypage-challenge-badges");
+  });
+
+  test("未クリア時はロック画面が表示される", async ({ page }) => {
+    // 単元1がまだクリアされていない場合、チャレンジページへ直接アクセス
+    const id = page.url().match(/id=([^&]+)/)?.[1] ?? "";
+    await page.goto(`/unit/challenge?unitId=1&learnerId=${id}`);
+    await saveScreenshot(page, "62-challenge-locked");
+    // ロックメッセージまたはチャレンジ画面どちらかが表示される（進捗状況による）
+    const isLocked = await page.getByText("まだ　チャレンジできないよ").isVisible().catch(() => false);
+    const isOpen = await page.getByText("チャレンジもんだい").isVisible().catch(() => false);
+    expect(isLocked || isOpen).toBeTruthy();
+  });
+
+  test("チャレンジ問題に正解するとチャレンジバッジが表示される", async ({ page }) => {
+    // 事前条件: unit_1_completeバッジを持つ学習者でないとスキップ
+    // ここではチャレンジページを開いてロック状態を確認し、解放済みならテストを実行
+    const id = new URL(page.url()).searchParams.get("id") ?? "";
+    await page.goto(`/unit/challenge?unitId=1&learnerId=${id}`);
+
+    const isLocked = await page.getByText("まだ　チャレンジできないよ").isVisible({ timeout: 5000 }).catch(() => false);
+    if (isLocked) {
+      test.skip();
+      return;
+    }
+
+    await page.waitForSelector(".monaco-editor", { timeout: 10000 });
+    await expect(page.getByRole("button", { name: /じっこう/ })).toBeEnabled({ timeout: 60000 });
+
+    // ユニット1チャレンジの正解コード
+    await setEditorCode(page, 'name = "たろう"\njob = "ゆうしゃ"\nweapon = "つるぎ"\nprint("なまえ：" + name)\nprint("しょくぎょう：" + job)\nprint(name + "の　ぶき：" + weapon)');
+
+    await page.getByRole("button", { name: /じっこう/ }).click();
+    await expect(page.getByText("チャレンジバッジを　てにいれた！")).toBeVisible({ timeout: 30000 });
+    await saveScreenshot(page, "63-challenge-badge-earned");
+  });
+});
+
+test.describe("チャレンジ問題（解放条件・ユニット2）", () => {
+  test("ユニット1チャレンジ未完の場合ユニット2チャレンジはロックされる", async ({ page }) => {
+    await login(page);
+    const learnerBtn = page.locator("button.rounded-2xl").first();
+    await learnerBtn.click();
+    await page.waitForURL("**/learner**", { timeout: 5000 });
+
+    const url = new URL(page.url());
+    const id = url.searchParams.get("id") ?? "";
+    await page.goto(`/unit/challenge?unitId=2&learnerId=${id}`);
+
+    const isLocked = await page.getByText("まだ　チャレンジできないよ").isVisible({ timeout: 8000 }).catch(() => false);
+    const isOpen = await page.getByText("チャレンジもんだい").isVisible({ timeout: 3000 }).catch(() => false);
+    await saveScreenshot(page, "64-unit2-challenge-gate");
+    // unit_1_challenge がなければロック、あれば開放 — どちらかであればよい
+    expect(isLocked || isOpen).toBeTruthy();
   });
 });

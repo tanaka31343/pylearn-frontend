@@ -16,11 +16,24 @@ const UNITS = [
   { id: 3, title: "if文", sub: "てきとの　しょうぶを　つくろう" },
 ];
 
-const BADGE_LABELS: Record<string, string> = {
+const BASIC_BADGE_LABELS: Record<string, string> = {
   unit_1_complete: "🐍 へんすう",
   unit_2_complete: "🔢 えんざん",
   unit_3_complete: "⚡ if文",
 };
+
+const CHALLENGE_BADGE_LABELS: Record<string, string> = {
+  unit_1_challenge: "⚔️ へんすう",
+  unit_2_challenge: "💥 えんざん",
+  unit_3_challenge: "🏆 if文",
+};
+
+// チャレンジ解放条件
+function canAttemptChallenge(unitId: number, earned: Set<string>): boolean {
+  const hasBasic = earned.has(`unit_${unitId}_complete`);
+  if (unitId === 1) return hasBasic;
+  return hasBasic && earned.has(`unit_${unitId - 1}_challenge`);
+}
 
 function MyPageInner() {
   useRequireAuth();
@@ -88,10 +101,11 @@ function MyPageInner() {
 
           {/* main */}
           <div className="flex flex-col gap-4">
+            {/* 基礎バッジ */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5">
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">とったバッジ</p>
               <div className="flex gap-3 flex-wrap">
-                {Object.entries(BADGE_LABELS).map(([type, label]) => (
+                {Object.entries(BASIC_BADGE_LABELS).map(([type, label]) => (
                   <div
                     key={type}
                     className={`bg-gray-100 rounded-xl px-4 py-3 text-center ${!earnedBadgeTypes.has(type) ? "opacity-30" : ""}`}
@@ -102,6 +116,22 @@ function MyPageInner() {
               </div>
             </div>
 
+            {/* チャレンジバッジ */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-5">
+              <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">チャレンジバッジ</p>
+              <div className="flex gap-3 flex-wrap">
+                {Object.entries(CHALLENGE_BADGE_LABELS).map(([type, label]) => (
+                  <div
+                    key={type}
+                    className={`rounded-xl px-4 py-3 text-center border ${earnedBadgeTypes.has(type) ? "bg-yellow-50 border-yellow-200" : "bg-gray-100 border-gray-100 opacity-30"}`}
+                  >
+                    <p className="text-sm">{label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 単元一覧 */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5">
               <p className="text-xs text-gray-400 uppercase tracking-wide mb-4">たんげん　いちらん</p>
               <div className="flex flex-col gap-3">
@@ -109,21 +139,50 @@ function MyPageInner() {
                   const done = progress.filter((p) => p.unit_id === unit.id && p.completed).length;
                   const isActive = done > 0 && done < 3;
                   const isComplete = done >= 3;
+                  const canChallenge = canAttemptChallenge(unit.id, earnedBadgeTypes);
+                  const challengeDone = earnedBadgeTypes.has(`unit_${unit.id}_challenge`);
+
                   return (
-                    <button
-                      key={unit.id}
-                      onClick={() => router.push(`/unit/explanation?unitId=${unit.id}&learnerId=${id}`)}
-                      className="flex items-center gap-3 p-3 border border-gray-200 hover:border-purple-400 rounded-xl text-left transition-colors"
-                    >
-                      <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-medium flex-shrink-0 ${isComplete ? "bg-green-100 text-green-700" : isActive ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-400"}`}>
-                        {isComplete ? "✓" : unit.id}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-800">{unit.title}</p>
-                        <p className="text-xs text-gray-400">{unit.sub}</p>
-                      </div>
-                      <div className="ml-auto text-gray-400 text-sm">→</div>
-                    </button>
+                    <div key={unit.id} className="flex items-center gap-2">
+                      {/* 単元ボタン */}
+                      <button
+                        onClick={() => router.push(`/unit/explanation?unitId=${unit.id}&learnerId=${id}`)}
+                        className="flex-1 flex items-center gap-3 p-3 border border-gray-200 hover:border-purple-400 rounded-xl text-left transition-colors"
+                      >
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-medium flex-shrink-0 ${isComplete ? "bg-green-100 text-green-700" : isActive ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-400"}`}>
+                          {isComplete ? "✓" : unit.id}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">{unit.title}</p>
+                          <p className="text-xs text-gray-400">{unit.sub}</p>
+                        </div>
+                        <div className="ml-auto text-gray-400 text-sm">→</div>
+                      </button>
+
+                      {/* チャレンジボタン */}
+                      <button
+                        onClick={() => router.push(`/unit/challenge?unitId=${unit.id}&learnerId=${id}`)}
+                        title={
+                          challengeDone
+                            ? "チャレンジ　クリアずみ！"
+                            : canChallenge
+                              ? "チャレンジに　ちょうせん！"
+                              : "えんしゅうを　クリアしてから　チャレンジしよう"
+                        }
+                        className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center text-xs font-medium flex-shrink-0 transition-colors border ${
+                          challengeDone
+                            ? "bg-yellow-50 border-yellow-300 text-yellow-700"
+                            : canChallenge
+                              ? "bg-yellow-400 hover:bg-yellow-500 border-yellow-400 text-white"
+                              : "bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed"
+                        }`}
+                      >
+                        <span className="text-base">{challengeDone ? "🏆" : canChallenge ? "⚔️" : "🔒"}</span>
+                        <span className="text-[10px] mt-0.5 leading-none">
+                          {challengeDone ? "クリア" : canChallenge ? "挑戦" : "みずらく"}
+                        </span>
+                      </button>
+                    </div>
                   );
                 })}
               </div>
