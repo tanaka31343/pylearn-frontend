@@ -48,16 +48,13 @@ const CHALLENGES: Record<number, ChallengeItem> = {
   },
   3: {
     question:
-      "【チャレンジ】しょうりしたら　ボーナススコアを　ひょうじしよう！\n\nゆうしゃのHP（hero_hp）= 40、てきのHP（enemy_hp）= 0。\nif文で　enemy_hp が 0いか（<= 0）なら「しょうり！」と　ひょうじして、\nボーナススコア = hero_hp * 10 を　けいさんして　「スコア：〇〇」と　ひょうじしよう！\nてきが　のこっている（else）ときは「まだたたかえ！」と　ひょうじしよう。",
+      "【チャレンジ】ぼうけんしゃの　ランクを　はんていしよう！\n\nhero_hp が 80いじょうなら「Sランク！」\nhero_hp が 50いじょうなら「Aランク！」\nhero_hp が 30いじょうなら「Bランク！」\nそれいがいは「Cランク…」と　ひょうじしよう。\n\nhero_hp = 65 で　ためしてね。",
     initialCode:
-      `hero_hp = 40\nenemy_hp = 0\n# if文で　しょうりはんてい\n\n# しょうりの　ときは　ボーナスを　けいさんしよう\n`,
-    expectedHint: "しょうり！\nスコア： 400",
+      `hero_hp = 65\n# if / elif / else で　ランクを　はんていしよう\n`,
+    expectedHint: "Aランク！",
     hint:
-      "if enemy_hp <= 0: の　ブロックに　print(\"しょうり！\") と　bonus = hero_hp * 10 と　print(\"スコア：\", bonus) を　かいてみよう！",
-    validate: (stdout) => {
-      const t = stdout.trim();
-      return t.includes("しょうり！") && t.includes("400");
-    },
+      "if hero_hp >= 80: → 「Sランク！」、elif hero_hp >= 50: → 「Aランク！」、elif hero_hp >= 30: → 「Bランク！」、else: → 「Cランク…」と　かいてみよう。hero_hp=65は　80みまん・50いじょうなので　「Aランク！」が　でるよ。",
+    validate: (stdout) => stdout.trim().includes("Aランク！"),
   },
 };
 
