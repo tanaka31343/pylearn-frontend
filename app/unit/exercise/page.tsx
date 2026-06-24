@@ -95,12 +95,36 @@ const EXERCISES: Record<number, ExerciseItem[]> = {
       validate: (stdout) => stdout.trim().includes("ピンチ！"),
     },
   ],
+  4: [
+    {
+      question: "str()をつかおう：score = 250 を　もじにして「スコア：250てん」と　ひょうじしよう。",
+      initialCode: `score = 250\n# str() でかずをもじにして + でくっつけよう\nprint(score)`,
+      expectedHint: "スコア：250てん",
+      hint: "print(\"スコア：\" + str(score) + \"てん\") と　かこう。str(score) で　かずが　もじに　なるよ！",
+      validate: (stdout) => stdout.trim() === "スコア：250てん",
+    },
+    {
+      question: "str()で　じょうほうを　くみあわせよう：name = \"たろう\"、level = 5 をつかって「たろう　レベル：5」と　ひょうじしよう。",
+      initialCode: `name = "たろう"\nlevel = 5\n# name と level を + でくっつけよう\nprint(name)`,
+      expectedHint: "たろう　レベル：5",
+      hint: "print(name + \"　レベル：\" + str(level)) と　かこう。level は　かず（int）なので　str() が　ひつようだよ。",
+      validate: (stdout) => stdout.trim() === "たろう　レベル：5",
+    },
+    {
+      question: "int()をつかおう：attack_str = \"30\" は　もじ（str）のかず。int() でほんとうのかずにして、damage = attack_str - 10 を　けいさんして　ひょうじしよう。",
+      initialCode: `attack_str = "30"\n# int() でかずに　かえよう\ndamage = attack_str - 10\nprint("ダメージ：" + str(damage))`,
+      expectedHint: "ダメージ：20",
+      hint: "attack = int(attack_str) とかいて、damage = attack - 10 に　なおそう。もじのまま　ひき算は　できないよ。",
+      validate: (stdout) => stdout.trim().includes("20"),
+    },
+  ],
 };
 
 const UNIT_BADGE: Record<number, { emoji: string; label: string }> = {
   1: { emoji: "🐍", label: "「へんすう　マスター」" },
   2: { emoji: "🔢", label: "「えんざん　マスター」" },
   3: { emoji: "⚡", label: "「if文　マスター」" },
+  4: { emoji: "🔄", label: "「データ型　マスター」" },
 };
 
 function ExercisePageInner() {
@@ -214,7 +238,7 @@ function ExercisePageInner() {
             >
               マイページに　もどる
             </button>
-            {uid < 3 && (
+            {uid < 4 && (
               <button
                 onClick={() => router.push(`/unit/explanation?unitId=${uid + 1}&learnerId=${learnerId}`)}
                 className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm font-medium"

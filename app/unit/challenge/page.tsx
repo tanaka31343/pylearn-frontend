@@ -56,12 +56,28 @@ const CHALLENGES: Record<number, ChallengeItem> = {
       "if hero_hp >= 80: → 「Sランク！」、elif hero_hp >= 50: → 「Aランク！」、elif hero_hp >= 30: → 「Bランク！」、else: → 「Cランク…」と　かいてみよう。hero_hp=65は　80みまん・50いじょうなので　「Aランク！」が　でるよ。",
     validate: (stdout) => stdout.trim().includes("Aランク！"),
   },
+  4: {
+    question:
+      "【チャレンジ】ぼうけんカードを　つくろう！\n\nname（もじ）・level（かず）・hp（かず）の　3つのへんすうを　つかって、したの　2こうを　ひょうじしよう。\n\n・1こうめ：「なまえ：たろう　Lv.5」\n・2こうめ：「HP：80」\n\nもじと　かずを + でくっつけるには　str()が　ひつようだよ！",
+    initialCode:
+      `name = "たろう"\nlevel = 5\nhp = 80\n# str() でかずを　もじに　かえて + でくっつけよう\n`,
+    expectedHint: "なまえ：たろう　Lv.5\nHP：80",
+    hint:
+      "print(\"なまえ：\" + name + \"　Lv.\" + str(level)) と　print(\"HP：\" + str(hp)) の　2行を　かいてみよう！",
+    validate: (stdout) => {
+      const lines = stdout.trim().split("\n");
+      const line1ok = lines[0]?.includes("なまえ：") && lines[0].includes("Lv.") && lines[0].includes("5");
+      const line2ok = lines[1]?.includes("HP：") && lines[1].includes("80");
+      return line1ok && line2ok;
+    },
+  },
 };
 
 const CHALLENGE_BADGE: Record<number, { emoji: string; label: string }> = {
   1: { emoji: "⚔️", label: "「へんすう　チャレンジャー」" },
   2: { emoji: "💥", label: "「えんざん　チャレンジャー」" },
   3: { emoji: "🏆", label: "「if文　チャレンジャー」" },
+  4: { emoji: "🧪", label: "「データ型　チャレンジャー」" },
 };
 
 function canAttempt(unitId: number, earnedBadges: Set<string>): boolean {

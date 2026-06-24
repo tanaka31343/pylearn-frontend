@@ -14,18 +14,21 @@ const UNITS = [
   { id: 1, title: "print・へんすう", sub: "キャラの　なまえを　きめよう" },
   { id: 2, title: "すうじ・えんざん", sub: "HPを　けいさんしよう" },
   { id: 3, title: "if文", sub: "てきとの　しょうぶを　つくろう" },
+  { id: 4, title: "データ型・型変換", sub: "もじと　かずを　くみあわせよう" },
 ];
 
 const BASIC_BADGE_LABELS: Record<string, string> = {
   unit_1_complete: "🐍 へんすう",
   unit_2_complete: "🔢 えんざん",
   unit_3_complete: "⚡ if文",
+  unit_4_complete: "🔄 データ型",
 };
 
 const CHALLENGE_BADGE_LABELS: Record<string, string> = {
   unit_1_challenge: "⚔️ へんすう",
   unit_2_challenge: "💥 えんざん",
   unit_3_challenge: "🏆 if文",
+  unit_4_challenge: "🧪 データ型",
 };
 
 // チャレンジ解放条件

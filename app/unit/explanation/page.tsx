@@ -65,12 +65,27 @@ const UNIT_CONTENT: Record<number, {
       },
     ],
   },
+  4: {
+    title: "データ型・型変換",
+    speech: "Pythonの　データには　「型（かた）」があるよ！\n\n・str（文字列）：「たろう」「100」のように　\"\" でかこんだもの\n・int（整数）：1、50、-3 のような　かず\n・float（小数）：3.14、100.0 のような　小数のかず\n\nstr()・int()・float() をつかうと　型を　かえられるよ。\n\n文字列と　かずを「+」でくっつけるときは str() が　ひつようだよ！",
+    codeBlocks: [
+      {
+        label: "str()：かずを　もじにする",
+        code: `score = 350\nprint("スコア：" + str(score))\n# → スコア：350`,
+      },
+      {
+        label: "int()・float()：もじを　かずにする",
+        code: `hp_str = "75"\nhp = int(hp_str)\nprint(hp + 25)   # → 100\n\nprice = float("1.5")\nprint(price * 2)  # → 3.0`,
+      },
+    ],
+  },
 };
 
 const UNIT_LIST = [
   { id: 1, title: "print・へんすう" },
   { id: 2, title: "すうじ・えんざん" },
   { id: 3, title: "if文" },
+  { id: 4, title: "データ型・型変換" },
 ];
 
 function ExplanationPageInner() {
