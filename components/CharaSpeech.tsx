@@ -26,7 +26,7 @@ export default function CharaSpeech({ text, charaType = "normal" }: Props) {
           className="object-cover w-full h-full"
         />
       </div>
-      <div className="bg-white border border-gray-200 rounded-xl rounded-bl-none px-4 py-3 text-sm leading-relaxed text-gray-800 max-w-xl">
+      <div className="bg-white border border-gray-200 rounded-xl rounded-bl-none px-4 py-3 text-sm leading-relaxed text-gray-800 max-w-xl whitespace-pre-wrap">
         {text}
       </div>
     </div>
