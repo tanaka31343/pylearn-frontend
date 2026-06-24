@@ -20,13 +20,13 @@ interface ChallengeItem {
 const CHALLENGES: Record<number, ChallengeItem> = {
   1: {
     question:
-      "【チャレンジ】ゆうしゃの　しょうかいカードを　つくろう！\n\n「name」「job」「weapon」の　3つの　へんすうに　すきな　なまえを　いれて、したの　3こうを　ぜんぶ　ひょうじしよう。\n\n・1こうめ：「なまえ：〇〇」\n・2こうめ：「しょくぎょう：〇〇」\n・3こうめ：「〇〇の　ぶき：〇〇」",
+      "【チャレンジ】ゆうしゃの　しょうかいカードを　つくろう！\n\n3つの　へんすうに　すきな　なまえを　いれよう。\n　name（なまえ）\n　job（しょくぎょう）\n　weapon（ぶき）\n\nひょうじする　3こう：\n・なまえ：〇〇\n・しょくぎょう：〇〇\n・〇〇の　ぶき：〇〇",
     initialCode:
       `name = ""\njob = ""\nweapon = ""\nprint("なまえ：" + name)\nprint("しょくぎょう：" + job)\nprint(name + "の　ぶき：" + weapon)`,
     expectedHint:
       "なまえ：たろう\nしょくぎょう：ゆうしゃ\nたろうの　ぶき：つるぎ",
     hint:
-      "name = \"たろう\" のように　3つの　へんすうに　なまえを　いれよう。print文は　かえなくて　OK！",
+      "name = \"たろう\" のように\n3つの　へんすうに　なまえを　いれよう。\nprint文は　かえなくて　OK！",
     validate: (stdout) => {
       const lines = stdout.trim().split("\n");
       if (lines.length < 3) return false;
@@ -38,32 +38,32 @@ const CHALLENGES: Record<number, ChallengeItem> = {
   },
   2: {
     question:
-      "【チャレンジ】3かいのこうげきで　ごうけいダメージを　もとめよう！\n\nゆうしゃの　こうげきりょく（attack）は 25、てきの　ぼうぎょりょく（defense）は 10。\n1かいの　ダメージ = attack - defense。\n3かいぶんの　ごうけいダメージを　けいさんして　「ごうけいダメージ：〇〇」と　ひょうじしよう！",
+      "【チャレンジ】3かいの　こうげきで\nごうけいダメージを　もとめよう！\n\nこうげきりょく（attack）：25\nぼうぎょりょく（defense）：10\n1かいの　ダメージ = attack - defense\nこうげきかいすう（hits）：3\n\n3かいぶんの　ごうけいダメージを　けいさんして\n「ごうけいダメージ：〇〇」と　ひょうじしよう！",
     initialCode:
       `attack = 25\ndefense = 10\nhits = 3\n# 1かいぶんの　ダメージを　もとめよう\ndamage = 0\n# 3かいぶんの　ごうけいを　もとめよう\ntotal = 0\nprint("ごうけいダメージ：", total)`,
     expectedHint: "ごうけいダメージ： 45",
     hint:
-      "damage = attack - defense で　1かいぶんのダメージ（15）が　でるよ。total = damage * hits で　3かいぶんのごうけい（45）が　もとめられるよ！",
+      "damage = attack - defense で\n1かいぶんのダメージ（15）が　でるよ。\ntotal = damage * hits で\n3かいぶんのごうけい（45）が　もとめられるよ！",
     validate: (stdout) => stdout.trim().includes("45"),
   },
   3: {
     question:
-      "【チャレンジ】ぼうけんしゃの　ランクを　はんていしよう！\n\nhero_hp が 80いじょうなら「Sランク！」\nhero_hp が 50いじょうなら「Aランク！」\nhero_hp が 30いじょうなら「Bランク！」\nそれいがいは「Cランク…」と　ひょうじしよう。\n\nhero_hp = 65 で　ためしてね。",
+      "【チャレンジ】ぼうけんしゃの　ランクを　はんていしよう！\n\nhero_hp = 65 で　ためしてね。\n\n・80いじょう　→「Sランク！」\n・50いじょう　→「Aランク！」\n・30いじょう　→「Bランク！」\n・それいがい　→「Cランク…」",
     initialCode:
       `hero_hp = 65\n# if / elif / else で　ランクを　はんていしよう\n`,
     expectedHint: "Aランク！",
     hint:
-      "if hero_hp >= 80: → 「Sランク！」、elif hero_hp >= 50: → 「Aランク！」、elif hero_hp >= 30: → 「Bランク！」、else: → 「Cランク…」と　かいてみよう。hero_hp=65は　80みまん・50いじょうなので　「Aランク！」が　でるよ。",
+      "if hero_hp >= 80: → 「Sランク！」\nelif hero_hp >= 50: → 「Aランク！」\nelif hero_hp >= 30: → 「Bランク！」\nelse: → 「Cランク…」\n\nhero_hp=65 は　50いじょうなので\n「Aランク！」が　でるよ。",
     validate: (stdout) => stdout.trim().includes("Aランク！"),
   },
   4: {
     question:
-      "【チャレンジ】ぼうけんカードを　つくろう！\n\nname（もじ）・level（かず）・hp（かず）の　3つのへんすうを　つかって、したの　2こうを　ひょうじしよう。\n\n・1こうめ：「なまえ：たろう　Lv.5」\n・2こうめ：「HP：80」\n\nもじと　かずを + でくっつけるには　str()が　ひつようだよ！",
+      "【チャレンジ】ぼうけんカードを　つくろう！\n\nつかうへんすう：\n　name（もじ）= \"たろう\"\n　level（かず）= 5\n　hp（かず）= 80\n\nひょうじする　2こう：\n・なまえ：たろう　Lv.5\n・HP：80\n\nかずを + でくっつけるには\nstr() が　ひつようだよ！",
     initialCode:
       `name = "たろう"\nlevel = 5\nhp = 80\n# str() でかずを　もじに　かえて + でくっつけよう\n`,
     expectedHint: "なまえ：たろう　Lv.5\nHP：80",
     hint:
-      "print(\"なまえ：\" + name + \"　Lv.\" + str(level)) と　print(\"HP：\" + str(hp)) の　2行を　かいてみよう！",
+      "print(\"なまえ：\" + name + \"　Lv.\" + str(level))\nprint(\"HP：\" + str(hp))\nの　2行を　かいてみよう！",
     validate: (stdout) => {
       const lines = stdout.trim().split("\n");
       const line1ok = lines[0]?.includes("なまえ：") && lines[0].includes("Lv.") && lines[0].includes("5");
