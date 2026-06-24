@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, Suspense } from "react";
+import { useState, useCallback, useRef, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -18,7 +18,7 @@ const EXERCISES: Record<number, {
   1: {
     question: "じぶんの　なまえを　へんすうに　いれて、「こんにちは、〇〇」と　ひょうじしよう！",
     initialCode: `name = ""\nprint("こんにちは、" + name)`,
-    expected: "こんにちは、",
+    expected: "こんにちは、たろう",
     hint: "name = \"たろう\" のように　なまえを　いれてみよう。",
   },
   2: {
@@ -55,6 +55,35 @@ function ExercisePageInner() {
   const [isIncorrect, setIsIncorrect] = useState(false);
   const [running, setRunning] = useState(false);
   const [showBadge, setShowBadge] = useState(false);
+  const [pyodideReady, setPyodideReady] = useState(false);
+  const workerRef = useRef<Worker | null>(null);
+  const callbacksRef = useRef<Map<number, (result: { stdout: string; stderr: string; exitCode: number }) => void>>(new Map());
+  const reqIdRef = useRef(0);
+
+  useEffect(() => {
+    const worker = new Worker("/pyodide-worker.js");
+    workerRef.current = worker;
+    worker.onmessage = (e) => {
+      const { id, stdout, stderr, exitCode } = e.data;
+      if (id === -1) {
+        setPyodideReady(true);
+        return;
+      }
+      const cb = callbacksRef.current.get(id);
+      if (cb) { cb({ stdout, stderr, exitCode }); callbacksRef.current.delete(id); }
+    };
+    // ウォームアップ: Pyodideをバックグラウンドでロード
+    worker.postMessage({ id: -1, code: "1+1" });
+    return () => worker.terminate();
+  }, []);
+
+  const runCode = useCallback((code: string): Promise<{ stdout: string; stderr: string; exitCode: number }> => {
+    return new Promise((resolve) => {
+      const id = ++reqIdRef.current;
+      callbacksRef.current.set(id, resolve);
+      workerRef.current?.postMessage({ id, code });
+    });
+  }, []);
 
   const startCooldown = useCallback(() => {
     setCooldown(3);
@@ -76,9 +105,9 @@ function ExercisePageInner() {
     startCooldown();
 
     try {
-      const res = await apiClient.post("/execute", { code });
-      const stdout = res.data.stdout.trim();
-      const stderr = res.data.stderr.trim();
+      const res = await runCode(code);
+      const stdout = res.stdout.trim();
+      const stderr = res.stderr.trim();
       setOutput(stdout);
       setStderr(stderr);
 
@@ -101,6 +130,8 @@ function ExercisePageInner() {
   };
 
   if (!ex) return null;
+
+  const runButtonDisabled = cooldown > 0 || running || !pyodideReady;
 
   if (showBadge) {
     return (
@@ -193,10 +224,10 @@ function ExercisePageInner() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleRun}
-              disabled={cooldown > 0 || running}
-              className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors ${cooldown > 0 || running ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-purple-500 hover:bg-purple-600 text-white"}`}
+              disabled={runButtonDisabled}
+              className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-colors ${runButtonDisabled ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-purple-500 hover:bg-purple-600 text-white"}`}
             >
-              ▶ {cooldown > 0 ? `まってね... (${cooldown}びょう)` : "じっこう"}
+              ▶ {!pyodideReady ? "よみこみちゅう..." : cooldown > 0 ? `まってね... (${cooldown}びょう)` : "じっこう"}
             </button>
           </div>
         </div>
