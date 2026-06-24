@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useLearnerStore } from "@/store/learnerStore";
@@ -22,7 +22,7 @@ const BADGE_LABELS: Record<string, string> = {
   unit_3_complete: "⚡ if文",
 };
 
-export default function MyPage() {
+function MyPageInner() {
   useRequireAuth();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -132,5 +132,13 @@ export default function MyPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function MyPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-sm text-gray-400">よみこみちゅう...</p></div>}>
+      <MyPageInner />
+    </Suspense>
   );
 }

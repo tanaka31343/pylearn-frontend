@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
@@ -35,7 +35,7 @@ const EXERCISES: Record<number, {
   },
 };
 
-export default function ExercisePage() {
+function ExercisePageInner() {
   useRequireAuth();
   const searchParams = useSearchParams();
   const unitId = searchParams.get("unitId");
@@ -227,5 +227,13 @@ export default function ExercisePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ExercisePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-sm text-gray-400">よみこみちゅう...</p></div>}>
+      <ExercisePageInner />
+    </Suspense>
   );
 }

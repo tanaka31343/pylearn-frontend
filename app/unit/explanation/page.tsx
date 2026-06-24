@@ -1,4 +1,5 @@
 "use client";
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useRequireAuth } from "@/hooks/useRequireAuth";
 import GlobalNav from "@/components/GlobalNav";
@@ -32,7 +33,7 @@ const UNIT_LIST = [
   { id: 3, title: "if文" },
 ];
 
-export default function ExplanationPage() {
+function ExplanationPageInner() {
   useRequireAuth();
   const searchParams = useSearchParams();
   const unitId = searchParams.get("unitId");
@@ -103,5 +104,13 @@ export default function ExplanationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ExplanationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-sm text-gray-400">よみこみちゅう...</p></div>}>
+      <ExplanationPageInner />
+    </Suspense>
   );
 }
