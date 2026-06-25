@@ -15,6 +15,11 @@ const UNITS = [
   { id: 2, title: "すうじ・えんざん", sub: "HPを　けいさんしよう" },
   { id: 3, title: "if文", sub: "てきとの　しょうぶを　つくろう" },
   { id: 4, title: "データ型・型変換", sub: "もじと　かずを　くみあわせよう" },
+  { id: 5, title: "リスト", sub: "てきや　アイテムを　まとめよう" },
+  { id: 6, title: "辞書", sub: "ステータスを　かんりしよう" },
+  { id: 7, title: "for・whileループ", sub: "バトルを　くりかえそう" },
+  { id: 8, title: "かんすう（def）", sub: "コードを　まとめよう" },
+  { id: 9, title: "randomライブラリ", sub: "ランダムに　エンカウント！" },
 ];
 
 const BASIC_BADGE_LABELS: Record<string, string> = {
@@ -22,6 +27,11 @@ const BASIC_BADGE_LABELS: Record<string, string> = {
   unit_2_complete: "🔢 えんざん",
   unit_3_complete: "⚡ if文",
   unit_4_complete: "🔄 データ型",
+  unit_5_complete: "📋 リスト",
+  unit_6_complete: "📖 辞書",
+  unit_7_complete: "🔁 ループ",
+  unit_8_complete: "🔧 かんすう",
+  unit_9_complete: "🎲 ランダム",
 };
 
 const CHALLENGE_BADGE_LABELS: Record<string, string> = {
@@ -29,6 +39,11 @@ const CHALLENGE_BADGE_LABELS: Record<string, string> = {
   unit_2_challenge: "💥 えんざん",
   unit_3_challenge: "🏆 if文",
   unit_4_challenge: "🧪 データ型",
+  unit_5_challenge: "📋 リスト",
+  unit_6_challenge: "📖 辞書",
+  unit_7_challenge: "🔁 ループ",
+  unit_8_challenge: "🔧 かんすう",
+  unit_9_challenge: "🎲 ランダム",
 };
 
 // チャレンジ解放条件
@@ -62,7 +77,7 @@ function MyPageInner() {
   }, [id]);
 
   const completedSteps = progress.filter((p) => p.completed).length;
-  const totalSteps = UNITS.length * 3;
+  const totalSteps = 9 * 3;
   const earnedBadgeTypes = new Set(badges.map((b) => b.badge_type));
 
   return (

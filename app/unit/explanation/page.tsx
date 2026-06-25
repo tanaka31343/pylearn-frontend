@@ -79,6 +79,76 @@ const UNIT_CONTENT: Record<number, {
       },
     ],
   },
+  5: {
+    title: "リスト",
+    speech: "「リスト」をつかうと、たくさんの　データを　まとめて　おけるよ！\n\n・リストの　つくりかた：\n　enemies = [\"スライム\", \"ゴブリン\", \"ドラゴン\"]\n\n・ばんごう（インデックス）で　とりだす：\n　enemies[0]  # → スライム\n　（0から　はじまるよ！）\n\n・ついか（append）：\n　enemies.append(\"まおう\")\n\n・かず（len）：\n　len(enemies)  # → 4",
+    codeBlocks: [
+      {
+        label: "リストと　インデックス",
+        code: `enemies = ["スライム", "ゴブリン", "ドラゴン"]\nprint(enemies[0])  # → スライム\nprint(enemies[1])  # → ゴブリン\nprint(enemies[2])  # → ドラゴン`,
+      },
+      {
+        label: "append と len",
+        code: `items = ["つるぎ", "たて"]\nitems.append("ポーション")\nprint(len(items))   # → 3\nprint(items[2])     # → ポーション`,
+      },
+    ],
+  },
+  6: {
+    title: "辞書",
+    speech: "「辞書（じしょ）」をつかうと、なまえを　つけて　データを　まとめられるよ！\n\n・辞書の　つくりかた：\n　hero = {\"name\": \"たろう\", \"hp\": 100}\n\n・データの　とりだしかた：\n　hero[\"name\"]  # → たろう\n\n・データの　こうしん：\n　hero[\"hp\"] = 70\n\nリストが「ばんごう」で　とりだすのに対して、\n辞書は「なまえ（キー）」で　とりだすよ！",
+    codeBlocks: [
+      {
+        label: "辞書の　つくりかたと　アクセス",
+        code: `hero = {"name": "たろう", "hp": 100, "attack": 20}\nprint(hero["name"])    # → たろう\nprint(hero["hp"])      # → 100\nprint(hero["attack"])  # → 20`,
+      },
+      {
+        label: "値の　こうしん",
+        code: `hero = {"name": "たろう", "hp": 100}\nhero["hp"] = hero["hp"] - 35\nprint(hero["name"] + "のHP：" + str(hero["hp"]))\n# → たろうのHP：65`,
+      },
+    ],
+  },
+  7: {
+    title: "for・whileループ",
+    speech: "「ループ」をつかうと、おなじ　しょりを　くりかえせるよ！\n\n・for文（リストの　くりかえし）：\n　for enemy in enemies:\n　    print(enemy)\n\n・range()：\n　for i in range(3):  # 0, 1, 2\n\n・while文：\n　while hp > 0:\n　    hp = hp - 10\n\n・break：\n　ループを　とちゅうで　やめる",
+    codeBlocks: [
+      {
+        label: "for文",
+        code: `enemies = ["スライム", "ゴブリン", "ドラゴン"]\nfor enemy in enemies:\n    print(enemy + "が　あらわれた！")`,
+      },
+      {
+        label: "while文",
+        code: `hp = 30\nwhile hp > 0:\n    hp = hp - 10\n    print("のこりHP：" + str(hp))\nprint("たおれた…")`,
+      },
+    ],
+  },
+  8: {
+    title: "かんすう（def）",
+    speech: "「かんすう（def）」をつかうと、コードを　まとめて　なまえを　つけられるよ！\n\n・かんすうの　つくりかた：\n　def greet(name):\n　    print(\"こんにちは、\" + name + \"！\")\n\n・よびだしかた：\n　greet(\"たろう\")  # こんにちは、たろう！\n\n・もどりち（return）：\n　def add(a, b):\n　    return a + b\n　result = add(10, 5)  # → 15\n\nかんすうを　つかうと、おなじコードを　なんどでも　つかいまわせるよ！",
+    codeBlocks: [
+      {
+        label: "引数（ひきすう）あり",
+        code: `def greet(name):\n    print("こんにちは、" + name + "！")\n\ngreet("たろう")   # こんにちは、たろう！\ngreet("はなこ")   # こんにちは、はなこ！`,
+      },
+      {
+        label: "もどりち（return）",
+        code: `def damage(atk, def_):\n    return atk - def_\n\ndmg = damage(25, 10)\nprint("ダメージ：" + str(dmg))  # → 15`,
+      },
+    ],
+  },
+  9: {
+    title: "randomライブラリ",
+    speech: "「random」ライブラリをつかうと、ランダムな　かずや　もじを　えらべるよ！\n\nまず　import が　ひつようだよ：\n　import random\n\n・ランダムな　せいすう（randint）：\n　random.randint(1, 6)  # 1〜6の　かず\n\n・リストから　ランダムに　えらぶ（choice）：\n　random.choice(enemies)\n\nゲームの　ダメージの　ブレや、\nランダムエンカウントに　つかえるよ！",
+    codeBlocks: [
+      {
+        label: "randint：ランダムな　かず",
+        code: `import random\ndice = random.randint(1, 6)\nprint("さいころ：" + str(dice))  # 1〜6`,
+      },
+      {
+        label: "choice：リストから　えらぶ",
+        code: `import random\nenemies = ["スライム", "ゴブリン", "ドラゴン"]\nenemy = random.choice(enemies)\nprint("エンカウント：" + enemy)`,
+      },
+    ],
+  },
 };
 
 const UNIT_LIST = [
@@ -86,6 +156,11 @@ const UNIT_LIST = [
   { id: 2, title: "すうじ・えんざん" },
   { id: 3, title: "if文" },
   { id: 4, title: "データ型・型変換" },
+  { id: 5, title: "リスト" },
+  { id: 6, title: "辞書" },
+  { id: 7, title: "for・whileループ" },
+  { id: 8, title: "かんすう（def）" },
+  { id: 9, title: "randomライブラリ" },
 ];
 
 function ExplanationPageInner() {

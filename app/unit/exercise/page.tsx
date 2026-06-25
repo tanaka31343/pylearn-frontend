@@ -118,6 +118,157 @@ const EXERCISES: Record<number, ExerciseItem[]> = {
       validate: (stdout) => stdout.trim().includes("20"),
     },
   ],
+  5: [
+    {
+      question: "リストを　つくって　さいしょの　てきを　ひょうじしよう！\nenemies = [\"スライム\", \"ゴブリン\", \"ドラゴン\"]\nえんしゅう：enemies[0] を　ひょうじしてね。",
+      initialCode: `enemies = ["スライム", "ゴブリン", "ドラゴン"]\n# さいしょの　てきを　ひょうじしよう\nprint(enemies)`,
+      expectedHint: "スライム",
+      hint: "print(enemies[0]) と　かこう。インデックスは　0から　はじまるよ！",
+      validate: (stdout) => stdout.trim() === "スライム",
+    },
+    {
+      question: "リストの　2ばんめの　てきを　ひょうじしよう！\nenemies = [\"スライム\", \"ゴブリン\", \"ドラゴン\"]\nえんしゅう：2ばんめ（インデックス1）を　ひょうじしてね。",
+      initialCode: `enemies = ["スライム", "ゴブリン", "ドラゴン"]\n# 2ばんめの　てきを　ひょうじしよう\nprint(enemies[0])`,
+      expectedHint: "ゴブリン",
+      hint: "print(enemies[1]) と　かこう。2ばんめは　インデックス1だよ！",
+      validate: (stdout) => stdout.trim() === "ゴブリン",
+    },
+    {
+      question: "append で　てきを　ついかして、len で　かずを　ひょうじしよう！\nenemies に「まおう」を　ついかして、ごうけいの　てきの　かずを　ひょうじしてね。",
+      initialCode: `enemies = ["スライム", "ゴブリン", "ドラゴン"]\n# まおうを　ついかしよう\n\nprint("てきの　かず：" + str(len(enemies)))`,
+      expectedHint: "てきの　かず：4",
+      hint: "enemies.append(\"まおう\") と　かいて、まおうを　リストに　ついかしよう。len(enemies) で　かずが　わかるよ！",
+      validate: (stdout) => stdout.trim().includes("4"),
+    },
+    {
+      question: "リストの　さいごの　てきを　ひょうじしよう！\nenemies = [\"スライム\", \"ゴブリン\", \"ドラゴン\"]\nえんしゅう：さいごの　てき（インデックス2）を　ひょうじしてね。",
+      initialCode: `enemies = ["スライム", "ゴブリン", "ドラゴン"]\n# さいごの　てきを　ひょうじしよう\nprint(enemies[0])`,
+      expectedHint: "ドラゴン",
+      hint: "print(enemies[2]) と　かこう。さいごは　インデックス2だよ（3こあるから0・1・2）！",
+      validate: (stdout) => stdout.trim() === "ドラゴン",
+    },
+  ],
+  6: [
+    {
+      question: "辞書から　なまえを　とりだして　ひょうじしよう！\nhero = {\"name\": \"たろう\", \"hp\": 100, \"attack\": 20}\nえんしゅう：hero[\"name\"] を　ひょうじしてね。",
+      initialCode: `hero = {"name": "たろう", "hp": 100, "attack": 20}\n# なまえを　とりだして　ひょうじしよう\nprint(hero)`,
+      expectedHint: "たろう",
+      hint: "print(hero[\"name\"]) と　かこう。\" \" の　なかに　キーを　いれるよ！",
+      validate: (stdout) => stdout.trim() === "たろう",
+    },
+    {
+      question: "バトルで　ダメージを　うけた！HPを　こうしんしよう。\nhero[\"hp\"] を　35　へらして、のこりのHPを　ひょうじしてね。",
+      initialCode: `hero = {"name": "たろう", "hp": 100, "attack": 20}\n# HPを　35　へらそう\n\nprint("のこりHP：" + str(hero["hp"]))`,
+      expectedHint: "のこりHP：65",
+      hint: "hero[\"hp\"] = hero[\"hp\"] - 35 と　かこう。",
+      validate: (stdout) => stdout.trim().includes("65"),
+    },
+    {
+      question: "辞書から　なまえと　HPを　両方　ひょうじしよう！\nhero の　name と　hp を　それぞれ　ひょうじしてね。",
+      initialCode: `hero = {"name": "たろう", "hp": 100, "attack": 20}\n# なまえと　HPを　ひょうじしよう\nprint(hero["name"])`,
+      expectedHint: "たろう\n100",
+      hint: "print(hero[\"name\"]) のあとに print(hero[\"hp\"]) も　かこう。",
+      validate: (stdout) => {
+        const lines = stdout.trim().split("\n");
+        return lines.some(l => l.includes("たろう")) && lines.some(l => l.includes("100"));
+      },
+    },
+    {
+      question: "辞書に　あたらしい　キーを　ついかしよう！\nhero に　level = 1 を　ついかして、ひょうじしてね。",
+      initialCode: `hero = {"name": "たろう", "hp": 100}\n# level = 1 を　ついかしよう\n\nprint("レベル：" + str(hero["level"]))`,
+      expectedHint: "レベル：1",
+      hint: "hero[\"level\"] = 1 と　かいて、あたらしいキーを　ついかしよう！",
+      validate: (stdout) => stdout.trim().includes("1"),
+    },
+  ],
+  7: [
+    {
+      question: "for文で　リストの　てきを　ぜんぶ　ひょうじしよう！\nitems = [\"つるぎ\", \"たて\", \"ポーション\"]\nfor文をつかって　1こずつ　ひょうじしてね。",
+      initialCode: `items = ["つるぎ", "たて", "ポーション"]\n# for文で　ぜんぶ　ひょうじしよう\n`,
+      expectedHint: "つるぎ\nたて\nポーション",
+      hint: "for item in items: と　かいて、その下に　print(item) と　かこう。インデントを　わすれずに！",
+      validate: (stdout) => {
+        const lines = stdout.trim().split("\n");
+        return lines.some(l => l.includes("つるぎ")) && lines.some(l => l.includes("たて")) && lines.some(l => l.includes("ポーション"));
+      },
+    },
+    {
+      question: "range() で　1〜3の　かずを　ひょうじしよう！\nfor i in range(3): で　0・1・2 が　でるよ。\n「こうげき 1かいめ！」「こうげき 2かいめ！」「こうげき 3かいめ！」と　ひょうじしてね。",
+      initialCode: `# range(3) は　0, 1, 2 の　じゅんに　くりかえすよ\nfor i in range(3):\n    print("こうげき " + str(i) + "かいめ！")`,
+      expectedHint: "こうげき 1かいめ！\nこうげき 2かいめ！\nこうげき 3かいめ！",
+      hint: "str(i + 1) と　かくと　1・2・3に　なるよ！",
+      validate: (stdout) => {
+        const lines = stdout.trim().split("\n");
+        return lines.some(l => l.includes("1かいめ")) && lines.some(l => l.includes("3かいめ"));
+      },
+    },
+    {
+      question: "while文で　HPが　0に　なるまで　くりかえそう！\nhp = 30 から　まいかい　10ずつ　へって、のこりHPを　ひょうじしてね。",
+      initialCode: `hp = 30\n# while文で　くりかえそう\nwhile hp > 0:\n    hp = hp - 10\n    print("のこりHP：" + str(hp))`,
+      expectedHint: "のこりHP：20\nのこりHP：10\nのこりHP：0",
+      hint: "このコードは　もう　かかれているよ！じっこうして　かくにんしてみよう。",
+      validate: (stdout) => stdout.trim().includes("のこりHP：0"),
+    },
+    {
+      question: "break で　ループを　とちゅうで　やめよう！\n0から　かぞえて、3に　なったら　break で　ストップ。\n0・1・2 だけ　ひょうじしてね。",
+      initialCode: `for i in range(10):\n    # i が 3 に　なったら　やめる\n    if i == 3:\n        break\n    print(i)`,
+      expectedHint: "0\n1\n2",
+      hint: "このコードを　そのまま　じっこうしてみよう！break で　i=3 の　まえに　とまるよ。",
+      validate: (stdout) => {
+        const lines = stdout.trim().split("\n");
+        return lines.includes("0") && lines.includes("2") && !lines.includes("3");
+      },
+    },
+  ],
+  8: [
+    {
+      question: "かんすうを　つくって　よびだそう！\ngreet() という　かんすうを　つくって「こんにちは！」と　ひょうじしてね。",
+      initialCode: `# greet かんすうを　つくろう\ndef greet():\n    print("")\n\n# よびだす\ngreet()`,
+      expectedHint: "こんにちは！",
+      hint: "print(\"こんにちは！\") と　かこう。かんすうを　よびだすには　greet() と　かく。",
+      validate: (stdout) => stdout.trim() === "こんにちは！",
+    },
+    {
+      question: "ひきすう（引数）あり　かんすうを　つくろう！\ngreet(name) という　かんすうで「こんにちは、たろう！」と　ひょうじしてね。",
+      initialCode: `def greet(name):\n    # name をつかって　あいさつしよう\n    print("")\n\ngreet("たろう")`,
+      expectedHint: "こんにちは、たろう！",
+      hint: "print(\"こんにちは、\" + name + \"！\") と　かこう。name に　よびだしの　ときの　もじが　はいるよ！",
+      validate: (stdout) => stdout.trim() === "こんにちは、たろう！",
+    },
+    {
+      question: "もどりち（return）あり　かんすうを　つくろう！\nadd(a, b) という　かんすうで　a + b の　けっかを　もどして、10 + 20 の　けっかを　ひょうじしてね。",
+      initialCode: `def add(a, b):\n    # a + b を　もどそう\n    return 0\n\nresult = add(10, 20)\nprint("こたえ：" + str(result))`,
+      expectedHint: "こたえ：30",
+      hint: "return a + b と　かこう。return で　けっかを　かえすと、result に　はいるよ！",
+      validate: (stdout) => stdout.trim().includes("30"),
+    },
+  ],
+  9: [
+    {
+      question: "import random をつかって、さいころを　ふろう！\nrandom.randint(1, 6) で　1〜6の　かずを　だして「さいころ：〇」と　ひょうじしてね。",
+      initialCode: `import random\n# randint で　1〜6の　かずを　だそう\ndice = random.randint(1, 6)\nprint("さいころ：" + str(dice))`,
+      expectedHint: "さいころ：3（1〜6の　どれかが　でるよ）",
+      hint: "このコードを　そのまま　じっこうしてみよう！じっこうするたびに　ちがう　かずが　でるよ。",
+      validate: (stdout) => stdout.trim().startsWith("さいころ："),
+    },
+    {
+      question: "random.choice で　リストから　ランダムに　えらぼう！\nenemies = [\"スライム\", \"ゴブリン\", \"ドラゴン\"] から　1ひき　えらんで「エンカウント：〇〇」と　ひょうじしてね。",
+      initialCode: `import random\nenemies = ["スライム", "ゴブリン", "ドラゴン"]\n# choice で　1ひき　えらぼう\nenemy = random.choice(enemies)\nprint("エンカウント：" + enemy)`,
+      expectedHint: "エンカウント：スライム（ランダムに　かわるよ）",
+      hint: "このコードを　そのまま　じっこうしてみよう！じっこうするたびに　ちがう　てきが　でるよ。",
+      validate: (stdout) => {
+        const t = stdout.trim();
+        return t.startsWith("エンカウント：") && ["スライム", "ゴブリン", "ドラゴン"].some(e => t.includes(e));
+      },
+    },
+    {
+      question: "random.randint で　ダメージに　ブレを　だそう！\ndamage = random.randint(10, 20) で　ランダムなダメージを　だして「ダメージ：〇〇」と　ひょうじしてね。",
+      initialCode: `import random\n# ランダムな　ダメージを　だそう\ndamage = random.randint(10, 20)\nprint("ダメージ：" + str(damage))`,
+      expectedHint: "ダメージ：15（10〜20の　どれかが　でるよ）",
+      hint: "このコードを　そのまま　じっこうしてみよう！10〜20の　ランダムな　ダメージが　でるよ。",
+      validate: (stdout) => stdout.trim().startsWith("ダメージ："),
+    },
+  ],
 };
 
 const UNIT_BADGE: Record<number, { emoji: string; label: string }> = {
@@ -125,6 +276,11 @@ const UNIT_BADGE: Record<number, { emoji: string; label: string }> = {
   2: { emoji: "🔢", label: "「えんざん　マスター」" },
   3: { emoji: "⚡", label: "「if文　マスター」" },
   4: { emoji: "🔄", label: "「データ型　マスター」" },
+  5: { emoji: "📋", label: "「リスト　マスター」" },
+  6: { emoji: "📖", label: "「辞書　マスター」" },
+  7: { emoji: "🔁", label: "「ループ　マスター」" },
+  8: { emoji: "🔧", label: "「かんすう　マスター」" },
+  9: { emoji: "🎲", label: "「ランダム　マスター」" },
 };
 
 function ExercisePageInner() {
@@ -238,7 +394,7 @@ function ExercisePageInner() {
             >
               マイページに　もどる
             </button>
-            {uid < 4 && (
+            {uid < 9 && (
               <button
                 onClick={() => router.push(`/unit/explanation?unitId=${uid + 1}&learnerId=${learnerId}`)}
                 className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg text-sm font-medium"

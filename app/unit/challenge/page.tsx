@@ -71,6 +71,68 @@ const CHALLENGES: Record<number, ChallengeItem> = {
       return line1ok && line2ok;
     },
   },
+  5: {
+    question:
+      "【チャレンジ】てきリストを　かんりしよう！\n\nenemies = [\"スライム\", \"ゴブリン\", \"ドラゴン\"]\n\nやること：\n① さいしょの　てきを　ひょうじする\n　→「てき：スライム」\n② 「まおう」を　リストに　ついかする\n③ ごうけいの　てきの　かずを　ひょうじ\n　→「のこり：4たい」",
+    initialCode:
+      `enemies = ["スライム", "ゴブリン", "ドラゴン"]\n# ① さいしょの　てきを　ひょうじしよう\n\n# ② まおうを　ついかしよう\n\n# ③ ごうけいの　かずを　ひょうじしよう\n`,
+    expectedHint: "てき：スライム\nのこり：4たい",
+    hint:
+      "① print(\"てき：\" + enemies[0])\n② enemies.append(\"まおう\")\n③ print(\"のこり：\" + str(len(enemies)) + \"たい\")\nの　3ぎょうを　かいてみよう！",
+    validate: (stdout) => {
+      const lines = stdout.trim().split("\n");
+      return lines.some(l => l.includes("スライム")) && lines.some(l => l.includes("4"));
+    },
+  },
+  6: {
+    question:
+      "【チャレンジ】ゆうしゃの　ステータスを　辞書で　かんりしよう！\n\nhero 辞書（name・hp・attack）を　つくって、\nバトルで　35ダメージを　うけた　あとの\nステータスを　3こう　ひょうじしよう：\n・なまえ：たろう\n・HP：65\n・こうげき：20",
+    initialCode:
+      `hero = {"name": "たろう", "hp": 100, "attack": 20}\n# バトルで　35ダメージ　うけた\n\n# 3こう　ひょうじしよう\n`,
+    expectedHint: "なまえ：たろう\nHP：65\nこうげき：20",
+    hint:
+      "hero[\"hp\"] = hero[\"hp\"] - 35 でHP　こうしん。\nprint(\"なまえ：\" + hero[\"name\"])\nprint(\"HP：\" + str(hero[\"hp\"]))\nprint(\"こうげき：\" + str(hero[\"attack\"]))\nの　3ぎょうを　かこう！",
+    validate: (stdout) => {
+      const lines = stdout.trim().split("\n");
+      return lines.some(l => l.includes("たろう")) && lines.some(l => l.includes("65")) && lines.some(l => l.includes("20"));
+    },
+  },
+  7: {
+    question:
+      "【チャレンジ】while文で　バトルを　つくろう！\n\nenemy_hp = 45、attack = 15 で、\nてきのHPが　0いか　になるまで　こうげきしよう。\n\nまいかい「てきのHP：〇〇」と　ひょうじして、\nさいごに「かった！」と　ひょうじしてね。",
+    initialCode:
+      `enemy_hp = 45\nattack = 15\n# while文で　バトル！\n`,
+    expectedHint: "てきのHP：30\nてきのHP：15\nてきのHP：0\nかった！",
+    hint:
+      "while enemy_hp > 0: と　かいて、\n　enemy_hp = enemy_hp - attack\n　print(\"てきのHP：\" + str(enemy_hp))\nloop の　あとに　print(\"かった！\") を　かこう！",
+    validate: (stdout) => stdout.trim().includes("かった！") && stdout.includes("てきのHP："),
+  },
+  8: {
+    question:
+      "【チャレンジ】2つの　かんすうを　つくろう！\n\n① show_status(name, hp)\n　→「なまえ：〇〇」「HP：〇〇」を　ひょうじ\n\n② calc_damage(atk, defense)\n　→ atk - defense を　もどす（return）\n\ndamage = calc_damage(25, 10) で　けいさんして\n「ダメージ：15」を　ひょうじ、\nそのあと show_status(\"たろう\", 80) を　よびだそう。",
+    initialCode:
+      `# ① show_status かんすう\ndef show_status(name, hp):\n    print("なまえ：" + name)\n    print("HP：" + str(hp))\n\n# ② calc_damage かんすう\ndef calc_damage(atk, defense):\n    return 0  # atk - defense に　なおそう\n\ndamage = calc_damage(25, 10)\nprint("ダメージ：" + str(damage))\nshow_status("たろう", 80)`,
+    expectedHint: "ダメージ：15\nなまえ：たろう\nHP：80",
+    hint:
+      "calc_damage の return を\nreturn atk - defense に　なおそう！\nshow_status は　もう　できているよ。",
+    validate: (stdout) => {
+      const lines = stdout.trim().split("\n");
+      return lines.some(l => l.includes("15")) && lines.some(l => l.includes("たろう")) && lines.some(l => l.includes("80"));
+    },
+  },
+  9: {
+    question:
+      "【チャレンジ】ランダムバトルを　つくろう！\n\n① random.choice で　てきを　1ひき　えらぶ\n　→「エンカウント：〇〇が　あらわれた！」\n\n② random.randint(10, 20) で　ダメージを　だす\n　→「ダメージ：〇〇」\n\n③ if文で　ダメージが　15いじょうなら\n　「クリティカルヒット！」、\n　そうじゃなければ「こうげき　せいこう！」",
+    initialCode:
+      `import random\n\nenemies = ["スライム", "ゴブリン", "ドラゴン"]\n\n# ① てきを　えらぼう\nenemy = random.choice(enemies)\nprint("エンカウント：" + enemy + "が　あらわれた！")\n\n# ② ランダムな　ダメージ\ndamage = random.randint(10, 20)\nprint("ダメージ：" + str(damage))\n\n# ③ クリティカル　はんてい\nif damage >= 15:\n    print("クリティカルヒット！")\nelse:\n    print("こうげき　せいこう！")`,
+    expectedHint: "エンカウント：〇〇が　あらわれた！\nダメージ：〇〇\nクリティカルヒット！（または　こうげき　せいこう！）",
+    hint:
+      "このコードは　もう　かかれているよ！\nそのまま　じっこうしてみよう。\nじっこうするたびに　ちがう　てきが　でるよ！",
+    validate: (stdout) => {
+      return stdout.includes("エンカウント：") && stdout.includes("ダメージ：") &&
+        (stdout.includes("クリティカルヒット！") || stdout.includes("こうげき　せいこう！"));
+    },
+  },
 };
 
 const CHALLENGE_BADGE: Record<number, { emoji: string; label: string }> = {
@@ -78,6 +140,11 @@ const CHALLENGE_BADGE: Record<number, { emoji: string; label: string }> = {
   2: { emoji: "💥", label: "「えんざん　チャレンジャー」" },
   3: { emoji: "🏆", label: "「if文　チャレンジャー」" },
   4: { emoji: "🧪", label: "「データ型　チャレンジャー」" },
+  5: { emoji: "📋", label: "「リスト　チャレンジャー」" },
+  6: { emoji: "📖", label: "「辞書　チャレンジャー」" },
+  7: { emoji: "🔁", label: "「ループ　チャレンジャー」" },
+  8: { emoji: "🔧", label: "「かんすう　チャレンジャー」" },
+  9: { emoji: "🎲", label: "「ランダム　チャレンジャー」" },
 };
 
 function canAttempt(unitId: number, earnedBadges: Set<string>): boolean {
